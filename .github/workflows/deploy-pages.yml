@@ -85,6 +85,19 @@ jobs:
           sed -i 's|href="/manifest.webmanifest"|href="./manifest.webmanifest"|; s|href="/legche-icon.png"|href="./legche-icon.png"|; s|src="/_expo/|src="./_expo/|; s|register('\''/service-worker.js'\'')|register('\''./service-worker.js'\'')|' public/index.html
           sed -i 's|"id": "/"|"id": "./"|; s|"start_url": "/"|"start_url": "./"|; s|"scope": "/"|"scope": "./"|; s|"src": "/legche-icon.png"|"src": "./legche-icon.png"|' public/manifest.webmanifest
           sed -i "s|\['/', '/index.html', '/manifest.webmanifest', '/legche-icon.png'\]|['./', './index.html', './manifest.webmanifest', './legche-icon.png']|" public/service-worker.js
+          node <<'NODE'
+          const fs=require('fs');
+          const file='public/_expo/static/js/web/AppEntry-6c19df9e75705f5003421ca9947154d0.js';
+          let source=fs.readFileSync(file,'utf8');
+          const navOld='style:[Go.nav,Po.nav,{bottom:0,height:58,paddingBottom:3}]';
+          const navNew='style:[Go.nav,Po.nav,{bottom:8,height:58,paddingBottom:3}]';
+          const voiceOld='const t=Date.now();let o=!1,r=t,i=-160,a=0,n=!1,l=!1;Wa.current=setInterval';
+          const voiceNew='Ha.current=setTimeout(()=>{Ma.current&&zl(Ma.current).catch(()=>{})},6e3);return;const t=Date.now();let o=!1,r=t,i=-160,a=0,n=!1,l=!1;Wa.current=setInterval';
+          if(!source.includes(navOld))throw new Error('Navigation patch target not found');
+          if(!source.includes(voiceOld))throw new Error('Voice patch target not found');
+          source=source.replace(navOld,navNew).replace(voiceOld,voiceNew);
+          fs.writeFileSync(file,source);
+          NODE
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

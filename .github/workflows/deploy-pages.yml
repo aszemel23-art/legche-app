@@ -1,0 +1,101 @@
+name: Deploy Legche to GitHub Pages
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download published app
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p public
+          cat > /tmp/paths.txt <<'EOF'
+index.html
+legche-icon.png
+manifest.webmanifest
+metadata.json
+service-worker.js
+assets/assets/articles/cafe.9edd038c46c15c32e7bc293ede5f5837.webp
+assets/assets/articles/cycle.97b0b2f16f6d5d2dd8d60220447350ef.webp
+assets/assets/articles/emotional.a404cf7bba94c2a0c00324326e52ecdf.webp
+assets/assets/articles/fiber.15286f8b07505553971cdac17f41a9a9.webp
+assets/assets/articles/holiday.ab41d5d22b52dfbd99bdb4e0c80f32ea.webp
+assets/assets/articles/hunger.f35839db43d5ae6208966a6d8f7faea7.webp
+assets/assets/articles/maintain.c1c1cb99ad25077a9adbb0048da7b401.webp
+assets/assets/articles/menopause.0e76afd34dd1a1b80ca0ec49e95b4151.webp
+assets/assets/articles/motivation.950a40f7f24a21ad0615a9004f1c5224.webp
+assets/assets/articles/overeat.1338b9848e288f8b85e690ae350e747a.webp
+assets/assets/articles/pace.2bdce0682c03690476c8e442d1f45bc3.webp
+assets/assets/articles/planning.b4ff6c75bb7d19e8982f5221a3a4b9a7.webp
+assets/assets/articles/plateau.4039dea07bba6428c748930c0098d15f.webp
+assets/assets/articles/protein.ca1b70867efadaba3e92e2a6588751bd.webp
+assets/assets/articles/sleep.533e59f063082e85ca3895d960df54af.webp
+assets/assets/articles/specialist.44411c6eb83d3b822c3fe6b70bf1978a.webp
+assets/assets/articles/strength.32a212486445a579d2d7ca797ea832ed.webp
+assets/assets/articles/sweet.9690b883fcb132569fd075dbb7a58eb9.webp
+assets/assets/articles/walking.7604e3de5625eef2dd6c37b94c620e62.webp
+assets/assets/articles/water.6543965d27ac09cf65496d8e91c552c6.webp
+assets/assets/articles/weekend.4e1e4e991c86f92943f11b7cfd8e8c7f.webp
+assets/assets/backgrounds/mint-botanical.32342373612697afef248920e972f4e4.webp
+assets/assets/body/body-female-v1.341e699f2c34d053e46aac99b52f078b.png
+assets/assets/body/body-male-v1.ccf53a812fc78c995c44680ed4beed39.png
+assets/assets/food/food-asian-atlas.f70f26c43e0b1e8e96c811823615e0b3.webp
+assets/assets/food/food-bars-sweets-atlas-v1.bffffc76b14e90626ed73db1a0c74c82.webp
+assets/assets/food/food-beet-pine-nuts-photo-v1.b7f9c6edad529d9e828d6d2d88241535.webp
+assets/assets/food/food-breakfast-snacks-atlas.dc63832564ba81a767ba8b218c988cea.webp
+assets/assets/food/food-common-photo-atlas-v1.b54aaa8d5d56ee9be06b7cdad853bc29.webp
+assets/assets/food/food-corn-puffs-photo-v1.4bcdc88f61031ff8169ce5c924384020.webp
+assets/assets/food/food-dairy-bakery-atlas.3ab4fdd5b26034a5cb11b41136242e17.webp
+assets/assets/food/food-desserts-atlas.a70884da59fd590b14b230a6182d4851.webp
+assets/assets/food/food-dishes-atlas.03920f7a0a8448a669af7e43faee3ecf.webp
+assets/assets/food/food-drinks-atlas.b89f108185a18cf28889fc0b401d9122.webp
+assets/assets/food/food-fruits-atlas.72ca64aa475fcb394274d8e45cbad036.webp
+assets/assets/food/food-fruits-extra-atlas.375f6baaa4085c9b9a39f15bf23f71bc.webp
+assets/assets/food/food-hematogen-photo-v2.65b5ded243a72365956aad62f5fc9f6b.webp
+assets/assets/food/food-meals-atlas.8cb9e0f7e27d7822ba461229b6049b0b.webp
+assets/assets/food/food-nuts-photo-v1.7d3f05cba5bd2e2dc15fda8ec9406421.webp
+assets/assets/food/food-processed-cheese-photo-v1.f61bb2a9d15e6a9effa139fb06934ebf.webp
+assets/assets/food/food-products-atlas.b9370400aadd7924de31aa45ea890232.webp
+assets/assets/food/food-proteins-atlas.2ba0ba7c725360ba5d8b9e5fd7e5bfaf.webp
+assets/assets/food/food-restaurant-atlas.541ef45c281a7a3f7df37807742d6d32.webp
+assets/assets/food/food-restaurant-premium-atlas.052518bfdf60ca1919813d46fbf50c9c.webp
+assets/assets/food/food-vegetables-atlas.90456927f0f80370103cd35bb5658d62.webp
+assets/assets/menu/menu-home.c9b2ca91f7d8b18b08b7fcbf59c74055.webp
+assets/assets/menu/menu-no-cook.a1b1e48798bc1a4399c87206f794c7b3.webp
+assets/assets/menu/menu-varied.2567f9e1a7047afd6695b392f4132d0e.webp
+assets/assets/sounds/water-milestone-chime-v2.1dcce9b386fea4ee1d28a46dcddbe4f7.wav
+_expo/static/js/web/AppEntry-6c19df9e75705f5003421ca9947154d0.js
+_expo/static/js/web/index-d036f2adee72ce145043201addc61c50.js
+EOF
+          while IFS= read -r path; do
+            mkdir -p "public/$(dirname "$path")"
+            curl --fail --location --retry 3 --silent --show-error "https://storage.yandexcloud.net/legche-web-azemels/$path" -o "public/$path"
+          done < /tmp/paths.txt
+          touch public/.nojekyll
+          sed -i 's|href="/manifest.webmanifest"|href="./manifest.webmanifest"|; s|href="/legche-icon.png"|href="./legche-icon.png"|; s|src="/_expo/|src="./_expo/|; s|register('\''/service-worker.js'\'')|register('\''./service-worker.js'\'')|' public/index.html
+          sed -i 's|"id": "/"|"id": "./"|; s|"start_url": "/"|"start_url": "./"|; s|"scope": "/"|"scope": "./"|; s|"src": "/legche-icon.png"|"src": "./legche-icon.png"|' public/manifest.webmanifest
+          sed -i "s|\['/', '/index.html', '/manifest.webmanifest', '/legche-icon.png'\]|['./', './index.html', './manifest.webmanifest', './legche-icon.png']|" public/service-worker.js
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4

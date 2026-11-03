@@ -85,6 +85,8 @@ jobs:
           sed -i 's|href="/manifest.webmanifest"|href="./manifest.webmanifest"|; s|href="/legche-icon.png"|href="./legche-icon.png"|; s|src="/_expo/|src="./_expo/|; s|register('\''/service-worker.js'\'')|register('\''./service-worker.js'\'')|' public/index.html
           sed -i 's|"id": "/"|"id": "./"|; s|"start_url": "/"|"start_url": "./"|; s|"scope": "/"|"scope": "./"|; s|"src": "/legche-icon.png"|"src": "./legche-icon.png"|' public/manifest.webmanifest
           sed -i "s|\['/', '/index.html', '/manifest.webmanifest', '/legche-icon.png'\]|['./', './index.html', './manifest.webmanifest', './legche-icon.png']|" public/service-worker.js
+          sed -i 's|AppEntry-6c19df9e75705f5003421ca9947154d0.js|AppEntry-6c19df9e75705f5003421ca9947154d0.js?v=voice-nav-2|' public/index.html
+          sed -i "s|const CACHE = 'legche-1.6.42'|const CACHE = 'legche-1.6.42-voice-nav-2'|" public/service-worker.js
           node <<'NODE'
           const fs=require('fs');
           const file='public/_expo/static/js/web/AppEntry-6c19df9e75705f5003421ca9947154d0.js';
